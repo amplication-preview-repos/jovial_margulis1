@@ -1,0 +1,75 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DB_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Search {
+  createdAt        DateTime @default(now())
+  feeds            Feed[]
+  id               String   @id @default(cuid())
+  imageUrl         String?
+  isPrivate        Boolean?
+  response         Json?
+  searchParameters Json?
+  updatedAt        DateTime @updatedAt
+  user             User?    @relation(name: "SearchesOnUser", fields: [userId], references: [id])
+  userId           String?
+  userId           Int?
+  users            User[]   @relation(name: "SearchOnUsers")
+}
+
+model Friendship {
+  createdAt DateTime @default(now())
+  friendId  Int?
+  id        String   @id @default(cuid())
+  updatedAt DateTime @updatedAt
+  userId    Int?
+  users     User[]
+}
+
+model Setting {
+  createdAt               DateTime @default(now())
+  id                      String   @id @default(cuid())
+  notificationPreferences Json?
+  privacySettings         Json?
+  updatedAt               DateTime @updatedAt
+  userId                  Int?
+  users                   User[]
+}
+
+model Feed {
+  createdAt DateTime @default(now())
+  id        String   @id @default(cuid())
+  search    Search?  @relation(fields: [searchId], references: [id])
+  searchId  String?
+  searchId  Int?
+  updatedAt DateTime @updatedAt
+}
+
+model User {
+  accessToken       String?
+  createdAt         DateTime    @default(now())
+  email             String?     @unique
+  firstName         String?
+  friendship        Friendship? @relation(fields: [friendshipId], references: [id])
+  friendshipId      String?
+  fullName          String?
+  id                String      @id @default(cuid())
+  instagramId       String?
+  lastName          String?
+  password          String
+  profilePictureUrl String?
+  refreshToken      String?
+  roles             Json
+  search            Search?     @relation(name: "SearchOnUsers", fields: [searchId], references: [id])
+  searchId          String?
+  searches          Search[]    @relation(name: "SearchesOnUser")
+  setting           Setting?    @relation(fields: [settingId], references: [id])
+  settingId         String?
+  updatedAt         DateTime    @updatedAt
+  username          String      @unique
+}
